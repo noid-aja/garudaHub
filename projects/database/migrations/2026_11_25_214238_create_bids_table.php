@@ -22,14 +22,14 @@ return new class extends Migration
                 ->constrained('users')
                 ->cascadeondelete();
 
-            $table->bigInteger('harga');
+            $table->unsignedBigInteger('harga');
             $table->unsignedInteger('durasi');
             $table->text('proposal');
             $table->boolean('is_winner')
                 ->default('0');
             $table->timestamps();
 
-            $table->unique('project_id', 'developer_id');
+            $table->unique(['project_id', 'developer_id']);
         });
     }
 

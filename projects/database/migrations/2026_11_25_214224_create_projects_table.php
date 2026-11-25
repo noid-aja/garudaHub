@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('judul', 100);
             $table->text('deskripsi',);
             $table->string('kategori', 50);
-            $table->bigInteger('budget_min')
+            $table->unsignedBigInteger('budget_min')
                     ->default(0);
-            $table->bigInteger('budget_max')
+            $table->unsignedBigInteger('budget_max')
                     ->default(0);
             $table->enum('status', ['terbuka','ditutup'])
                     ->default('terbuka');
