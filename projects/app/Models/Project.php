@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'budget_max',
     'batas_lelang',
     'status',])]
-class project extends Model
+class Project extends Model
 {
     protected function casts(): array{
         return [
