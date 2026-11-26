@@ -68,7 +68,14 @@ class ProjectController extends Controller
     {
         $project->load(['client', 'bids.developer']);
 
-        return view('projects.show', compact('project'));
+        $developers = User::where('role', 'developer')
+            ->orderBy('nama')
+            ->get();
+
+        return view('projects.show', compact(
+            'project',
+            'developers'
+    ));
     }
 
     /**
