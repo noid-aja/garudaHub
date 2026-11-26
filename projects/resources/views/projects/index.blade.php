@@ -1,12 +1,15 @@
-
 @extends('layouts.app')
 
 @section('content')
     <h1>Daftar Proyek Garuda-Hub</h1>
 
-    <a class="btn" href="{{ route('projects.create') }}">
-        + Tambah Proyek
-    </a>
+    @auth
+        @if (auth()->user()->role === 'klien')
+            <a class="btn" href="{{ route('projects.create') }}">
+                + Tambah Proyek
+            </a>
+        @endif
+    @endauth
 
     <form method="GET" action="{{ route('projects.index') }}"
           style="margin: 20px 0">
@@ -42,4 +45,6 @@
     @empty
         <p>Belum ada proyek.</p>
     @endforelse
+
+    {{ $projects->withQueryString()->links() }}
 @endsection

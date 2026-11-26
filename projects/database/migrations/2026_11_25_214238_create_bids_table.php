@@ -14,19 +14,19 @@ return new class extends Migration
         Schema::create('bids', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignid('project_id')
+            $table->foreignId('project_id')
                 ->constrained('projects')
-                ->cascadeondelete();
+                ->cascadeOnDelete();
 
-            $table->foreignid('developer_id')
+            $table->foreignId('developer_id')
                 ->constrained('users')
-                ->cascadeondelete();
+                ->cascadeOnDelete();
 
             $table->unsignedBigInteger('harga');
             $table->unsignedInteger('durasi');
             $table->text('proposal');
             $table->boolean('is_winner')
-                ->default('0');
+                ->default(false);
             $table->timestamps();
 
             $table->unique(['project_id', 'developer_id']);

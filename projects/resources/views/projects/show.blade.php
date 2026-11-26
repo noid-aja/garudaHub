@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -7,8 +6,6 @@
 
     <p><b>Klien:</b> {{ $project->client->nama }}</p>
     <p><b>Kategori:</b> {{ $project->kategori }}</p>
-
-    <p><b>Deskripsi:</b></p>
     <p style="white-space: pre-wrap">{{ $project->deskripsi }}</p>
 
     <p>
@@ -25,83 +22,77 @@
 
     <p><b>Status:</b> {{ ucfirst($project->status) }}</p>
 
-    <a class="btn" href="{{ route('projects.edit', $project) }}">
-        Edit Proyek
-    </a>
+    @auth
+        @if (
+            auth()->user()->role === 'klien'
+            && auth()->id() === $project->client_id
+            && !$project->bids->contains('is_winner', true)
+        )
+            <a class="btn"
+               href="{{ route('projects.edit', $project) }}">
+                Edit Proyek
+            </a>
 
-    <form action="{{ route('projects.destroy', $project) }}"
-          method="POST" style="display:inline">
-        @csrf
-        @method('DELETE')
+            <form method="POST"
+                  action="{{ route('projects.destroy', $project) }}"
+                  style="display:inline">
+                @csrf
+                @method('DELETE')
 
-        <button class="btn" type="submit">
-            Hapus Proyek
-        </button>
-    </form>
+                <button class="btn" type="submit">
+                    Hapus Proyek
+                </button>
+            </form>
+        @endif
+    @endauth
 </div>
 
 @if ($errors->any())
     <div class="card error">
-        <h3>Terjadi kesalahan:</h3>
-
         @foreach ($errors->all() as $error)
             <p>{{ $error }}</p>
         @endforeach
     </div>
 @endif
 
-@if (
-    $project->status === 'terbuka'
-    && !$project->batas_lelang->isBefore(today())
-)
-    <div class="card">
-        <h2>Ajukan Penawaran</h2>
+@auth
+    @if (
+        auth()->user()->role === 'developer'
+        && $project->status === 'terbuka'
+        && !$project->batas_lelang->isBefore(today())
+    )
+        <div class="card">
+            <h2>Ajukan Penawaran</h2>
 
-        <form method="POST"
-              action="{{ route('bids.store', $project) }}">
-            @csrf
+            <form method="POST"
+                  action="{{ route('bids.store', $project) }}">
+                @csrf
 
-            <label>Developer</label>
-            <select name="developer_id" required>
-                <option value="">Pilih Developer</option>
+                <p>
+                    Developer:
+                    <b>{{ auth()->user()->nama }}</b>
+                </p>
 
-                @foreach ($developers as $developer)
-                    <option value="{{ $developer->id }}"
-                        @selected(old('developer_id') == $developer->id)>
-                        {{ $developer->nama }}
-                    </option>
-                @endforeach
-            </select>
+                <label>Harga (Rp)</label>
+                <input type="number" name="harga" min="1"
+                       value="{{ old('harga') }}" required>
 
-            <label>Harga Penawaran (Rp)</label>
-            <input type="number"
-                   name="harga"
-                   min="1"
-                   value="{{ old('harga') }}"
-                   required>
+                <label>Durasi (hari)</label>
+                <input type="number" name="durasi" min="1"
+                       value="{{ old('durasi') }}" required>
 
-            <label>Durasi Pengerjaan (hari)</label>
-            <input type="number"
-                   name="durasi"
-                   min="1"
-                   value="{{ old('durasi') }}"
-                   required>
+                <label>Proposal</label>
+                <textarea name="proposal"
+                          maxlength="5000"
+                          required>{{ old('proposal') }}</textarea>
 
-            <label>Proposal</label>
-            <textarea name="proposal"
-                      maxlength="5000"
-                      required>{{ old('proposal') }}</textarea>
-
-            <button class="btn" type="submit">
-                Kirim Penawaran
-            </button>
-        </form>
-    </div>
-@else
-    <div class="card">
-        <p>Lelang sudah ditutup atau melewati batas waktu.</p>
-    </div>
-@endif
+                <button class="btn" type="submit">
+                    Kirim Penawaran
+                </button>
+            </form>
+        </div>
+    @endif
+@endauth
 
 <h2>Daftar Penawaran</h2>
 
@@ -115,54 +106,57 @@
         </p>
 
         <p><b>Durasi:</b> {{ $bid->durasi }} hari</p>
-
         <p style="white-space: pre-wrap">{{ $bid->proposal }}</p>
 
         @if ($bid->is_winner)
             <p class="success"><b>Pemenang Lelang</b></p>
         @endif
 
-@if (
-    app()->environment('local')
-    && $project->status === 'terbuka'
-    && !$project->bids->contains('is_winner', true)
-)
-    <form method="POST"
-          action="{{ route('bids.winner', [$project, $bid]) }}"
-          onsubmit="return confirm('Yakin memilih developer ini sebagai pemenang?')">
-        @csrf
+        @auth
+                        @if (
+                auth()->user()->role === 'developer'
+                && auth()->id() === $bid->developer_id
+                && $project->status === 'terbuka'
+                && !$project->batas_lelang->isBefore(today())
+            )
+                <a class="btn"
+                   href="{{ route('bids.edit', [$project, $bid]) }}">
+                    Edit Penawaran
+                </a>
 
-        <button type="submit" class="btn">
-            Pilih sebagai Pemenang
-        </button>
-    </form>
-@endif
+                <form method="POST"
+                      action="{{ route('bids.destroy', [$project, $bid]) }}"
+                      style="display:inline">
+                    @csrf
+                    @method('DELETE')
 
-        @if (
-            $project->status === 'terbuka'
-            && !$project->batas_lelang->isBefore(today())
-            && !$bid->is_winner
-        )
-            <a class="btn"
-               href="{{ route('bids.edit', [$project, $bid]) }}">
-                Edit Penawaran
-            </a>
+                    <button class="btn" type="submit">
+                        Hapus Penawaran
+                    </button>
+                </form>
+            @endif
 
-            <form method="POST"
-                  action="{{ route('bids.destroy', [$project, $bid]) }}"
-                  style="display:inline">
-                @csrf
-                @method('DELETE')
+                        @if (
+                auth()->user()->role === 'klien'
+                && auth()->id() === $project->client_id
+                && $project->status === 'terbuka'
+                && !$project->bids->contains('is_winner', true)
+            )
+                <form method="POST"
+                      action="{{ route('bids.winner', [$project, $bid]) }}"
+                      onsubmit="return confirm('Pilih developer ini sebagai pemenang?')">
+                    @csrf
 
-                <button type="submit" class="btn">
-                    Hapus Penawaran
-                </button>
-            </form>
-        @endif
+                    <button class="btn" type="submit">
+                        Pilih sebagai Pemenang
+                    </button>
+                </form>
+            @endif
+        @endauth
     </div>
 @empty
     <div class="card">
-        <p>Belum ada penawaran untuk proyek ini.</p>
+        <p>Belum ada penawaran.</p>
     </div>
 @endforelse
 

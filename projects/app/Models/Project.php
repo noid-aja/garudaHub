@@ -2,22 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['client_id',
+#[Fillable([
+    'client_id',
     'judul',
     'deskripsi',
     'kategori',
     'budget_min',
     'budget_max',
     'batas_lelang',
-    'status',])]
+    'status',
+])]
 class Project extends Model
 {
-    protected function casts(): array{
+    protected function casts(): array
+    {
         return [
             'batas_lelang' => 'date',
             'budget_min' => 'integer',
@@ -25,11 +28,13 @@ class Project extends Model
         ];
     }
 
-    public function client(): BelongsTo{
+    public function client(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'client_id');
     }
 
-    public function bids(): HasMany{
+    public function bids(): HasMany
+    {
         return $this->hasMany(Bid::class, 'project_id');
     }
 }

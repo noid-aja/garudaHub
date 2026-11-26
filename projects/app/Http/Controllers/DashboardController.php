@@ -2,77 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Project;
 use App\Models\Bid;
+use App\Models\Project;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    // Dashboard sementara hanya dapat dibuka di lokal.
-    private function hanyaLokal(): void
+    public function index(Request $request)
     {
-        abort_unless(app()->environment('local'), 403);
+        return match ($request->user()->role) {
+            'klien' => redirect()->route('dashboard.klien'),
+            'developer' => redirect()->route('dashboard.developer'),
+            'admin' => redirect()->route('dashboard.admin'),
+            default => abort(403),
+        };
     }
 
-    // Halaman untuk memilih akun simulasi.
-    public function index()
+    public function klien(Request $request)
     {
-        $this->hanyaLokal();
+        abort_unless($request->user()->role === 'klien', 403);
 
-        $clients = User::where('role', 'klien')
-            ->orderBy('nama')
-            ->get();
+        $user = $request->user();
+        $projects = $user->projects()->withCount('bids')->latest()->paginate(10);
 
-        $developers = User::where('role', 'developer')
-            ->orderBy('nama')
-            ->get();
-
-        return view('dashboard.index', compact(
-            'clients',
-            'developers'
-        ));
+        return view('dashboard.klien', compact('user', 'projects'));
     }
 
-    // Dashboard klien
-    public function klien(User $user)
+    public function developer(Request $request)
     {
-        $this->hanyaLokal();
+        abort_unless($request->user()->role === 'developer', 403);
 
-        abort_unless($user->role === 'klien', 404);
+        $user = $request->user();
+        $bids = $user->bids()->with('project')->latest()->paginate(10);
 
-        $projects = $user->projects()
-            ->withCount('bids')
-            ->latest()
-            ->get();
-
-        return view('dashboard.klien', compact(
-            'user',
-            'projects'
-        ));
+        return view('dashboard.developer', compact('user', 'bids'));
     }
 
-    // Dashboard developer
-    public function developer(User $user)
+    public function admin(Request $request)
     {
-        $this->hanyaLokal();
-
-        abort_unless($user->role === 'developer', 404);
-
-        $bids = $user->bids()
-            ->with('project')
-            ->latest()
-            ->get();
-
-        return view('dashboard.developer', compact(
-            'user',
-            'bids'
-        ));
-    }
-
-    // Dashboard admin
-    public function admin()
-    {
-        $this->hanyaLokal();
+        abort_unless($request->user()->role === 'admin', 403);
 
         $statistik = [
             'users' => User::count(),

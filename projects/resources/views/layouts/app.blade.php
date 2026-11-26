@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-store">
     <title>Garuda-Hub</title>
     <style>
         body {
@@ -55,20 +55,27 @@
     </style>
 </head>
 <body>
+    @if (!request()->routeIs('login', 'register'))
+        <header>
+            <a href="{{ route('projects.index') }}">Garuda-Hub</a>
 
-<header>
-    <a href="{{ route('projects.index') }}">
-        Garuda-Hub
-    </a>
+            @auth
+                <a href="{{ route('dashboard.index') }}"
+                   style="font-size:16px; margin-left:20px">Dashboard</a>
 
-    @if (app()->environment('local'))
-        <a href="{{ route('dashboard.index') }}"
-           style="margin-left: 25px; font-size: 16px;">
-            Dashboard
-        </a>
+                <span style="color:white; margin-left:20px">
+                    {{ auth()->user()->nama }} — {{ auth()->user()->email }}
+                    ({{ auth()->user()->role }})
+                </span>
+
+                <form method="POST" action="{{ route('logout') }}"
+                      style="display:inline; margin-left:20px">
+                    @csrf
+                    <button type="submit">Logout</button>
+                </form>
+            @endauth
+        </header>
     @endif
-</header>
-
 
     <main>
         @if (session('success'))
@@ -77,5 +84,13 @@
 
         @yield('content')
     </main>
+
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 </html>

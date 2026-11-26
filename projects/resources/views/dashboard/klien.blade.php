@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -6,7 +5,7 @@
 
 <div class="card">
     <h2>Selamat datang, {{ $user->nama }}</h2>
-    <p>Total proyek: {{ $projects->count() }}</p>
+    <p>Total proyek: {{ $projects->total() }}</p>
 
     <a class="btn" href="{{ route('projects.create') }}">
         Tambah Proyek
@@ -33,6 +32,8 @@
         <p>Belum memiliki proyek.</p>
     </div>
 @endforelse
+
+{{ $projects->links() }}
 
 <a href="{{ route('dashboard.index') }}">
     Kembali ke Dashboard

@@ -1,87 +1,66 @@
-
 @extends('layouts.app')
 
 @section('content')
-    <div class="card">
-        <h1>
-            {{ $project ? 'Edit Proyek' : 'Tambah Proyek' }}
-        </h1>
+<div class="card">
+    <h1>{{ $project ? 'Edit Proyek' : 'Tambah Proyek' }}</h1>
 
-        @if ($errors->any())
-            <div class="error">
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
-            </div>
+    @if ($errors->any())
+        <div class="error">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
+    <form method="POST" action="{{ $project ? route('projects.update', $project) : route('projects.store') }}">
+        @csrf
+        @if ($project)
+            @method('PUT')
         @endif
 
-        <form method="POST"
-              action="{{ $project
-                  ? route('projects.update', $project)
-                  : route('projects.store') }}">
+        <p><b>Klien:</b> {{ auth()->user()->nama }}</p>
 
-            @csrf
+        <label>Judul Proyek</label>
+        <input type="text" name="judul" maxlength="100"
+               value="{{ old('judul', $project?->judul) }}" required>
 
-            @if ($project)
-                @method('PUT')
-            @endif
+        <label>Deskripsi</label>
+        <textarea name="deskripsi" required>{{ old('deskripsi', $project?->deskripsi) }}</textarea>
 
-            <label>Klien</label>
-            <select name="client_id" required>
-                <option value="">Pilih Klien</option>
-                @foreach ($clients as $client)
-                    <option value="{{ $client->id }}"
-                        @selected(old('client_id', $project?->client_id) == $client->id)>
-                        {{ $client->nama }}
-                    </option>
-                @endforeach
-            </select>
+        <label>Kategori</label>
+        <input type="text" name="kategori"
+               value="{{ old('kategori', $project?->kategori) }}" required>
 
-            <label>Judul Proyek</label>
-            <input type="text" name="judul" maxlength="100"
-                   value="{{ old('judul', $project?->judul) }}"
-                   required>
+        <label>Budget Minimum (Rp)</label>
+        <input type="text" name="budget_min" id="budget_min" inputmode="numeric"
+               value="{{ number_format((int) preg_replace('/\D/', '', (string) old('budget_min', $project?->budget_min ?? 0)), 0, ',', '.') }}" required>
 
-            <label>Deskripsi</label>
-            <textarea name="deskripsi" required>{{ old('deskripsi', $project?->deskripsi) }}</textarea>
+        <label>Budget Maksimum (Rp)</label>
+        <input type="text" name="budget_max" id="budget_max" inputmode="numeric"
+               value="{{ number_format((int) preg_replace('/\D/', '', (string) old('budget_max', $project?->budget_max ?? 0)), 0, ',', '.') }}" required>
 
-            <label>Kategori</label>
-            <input type="text" name="kategori"
-                   value="{{ old('kategori', $project?->kategori) }}"
-                   required>
+        <label>Batas Lelang</label>
+        <input type="date" name="batas_lelang"
+               value="{{ old('batas_lelang', $project?->batas_lelang?->format('Y-m-d')) }}" required>
 
-            <label>Budget Minimum</label>
-            <input type="number" name="budget_min" min="0"
-                   value="{{ old('budget_min', $project?->budget_min ?? 0) }}"
-                   required>
+        <p><b>Status:</b> {{ ucfirst($project?->status ?? 'terbuka') }}</p>
 
-            <label>Budget Maksimum</label>
-            <input type="number" name="budget_max" min="0"
-                   value="{{ old('budget_max', $project?->budget_max ?? 0) }}"
-                   required>
+        <button class="btn" type="submit">Simpan Proyek</button>
+        <a href="{{ route('projects.index') }}">Batal</a>
+    </form>
+</div>
 
-            <label>Batas Lelang</label>
-            <input type="date" name="batas_lelang"
-                   value="{{ old('batas_lelang', $project?->batas_lelang?->format('Y-m-d')) }}"
-                   required>
+<script>
+    function formatRupiah(input) {
+        const angka = input.value.replace(/\D/g, '');
+        input.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
 
-            <label>Status</label>
-            <select name="status">
-                @foreach (['terbuka', 'ditutup'] as $status)
-                    <option value="{{ $status }}"
-                        @selected(old('status', $project?->status ?? 'terbuka') === $status)>
-                        {{ ucfirst($status) }}
-                    </option>
-                @endforeach
-            </select>
-
-            <button class="btn" type="submit">
-                Simpan Proyek
-            </button>
-
-            <a href="{{ route('projects.index') }}">
-                Batal
-            </a>
-        </form>
-    </div>
+    ['budget_min', 'budget_max'].forEach(function (id) {
+        const input = document.getElementById(id);
+        input.addEventListener('input', function () {
+            formatRupiah(input);
+        });
+    });
+</script>
 @endsection

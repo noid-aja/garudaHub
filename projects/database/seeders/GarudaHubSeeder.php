@@ -2,23 +2,22 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Project;
 use App\Models\Bid;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class GarudaHubSeeder extends Seeder
 {
-    public function run(): void{
+    public function run(): void
+    {
         DB::transaction(function () {
 
-            // Hash password asli dari data dummy dosen.
             $hashAdmin = '$2y$12$Whu4zQHp93BcHk.eOQI3kO3gQ0ByvWBQ4cGOLQlljMHGhnEfgi5ue';
             $hashKlien = '$2y$12$AW89bpkcNUdJpelLaz3CSuFoq24tXbzQFb7JHtT2gwK4HKOjKOIAS';
             $hashDeveloper = '$2y$12$72QTYKig6d0/wW8itXUS5OCiccRGDcgsbo4Wlcaa6nxKrJls3pER.';
 
-            // -- Pengguna (1 admin, 3 klien, 4 developer)
             $users = [
                 [1, 'Admin Garuda', 'admin@example.com', 'admin', $hashAdmin],
                 [2, 'Budi Santoso', 'budi@example.com', 'klien', $hashKlien],
@@ -45,47 +44,46 @@ class GarudaHubSeeder extends Seeder
                 $userIds[$id] = $user->id;
             }
 
-            // -- Proyek (8)
             $projects = [
                 [
                     1, 2, 'Website Toko Batik Online',
                     'Membutuhkan toko online dengan katalog produk, keranjang, dan halaman kontak. Desain responsif.',
-                    'Web', 5000000, 10000000, '2027-12-31', 'terbuka'
+                    'Web', 5000000, 10000000, '2027-12-31', 'terbuka',
                 ],
                 [
                     2, 2, 'Aplikasi Kasir Android',
                     'Aplikasi kasir sederhana untuk warung: catat transaksi, laporan harian, cetak struk via Bluetooth.',
-                    'Mobile', 8000000, 15000000, '2027-11-30', 'terbuka'
+                    'Mobile', 8000000, 15000000, '2027-11-30', 'terbuka',
                 ],
                 [
                     3, 3, 'Redesain Logo dan UI Kit',
                     'Redesain identitas visual startup kuliner beserta UI kit untuk aplikasi pemesanan.',
-                    'Desain', 2000000, 4000000, '2026-09-01', 'ditutup'
+                    'Desain', 2000000, 4000000, '2026-09-01', 'ditutup',
                 ],
                 [
                     4, 3, 'Dashboard Analitik Penjualan',
                     'Dashboard grafik penjualan bulanan dari file CSV, dengan filter per cabang dan ekspor laporan.',
-                    'Data', 6000000, 12000000, '2027-10-15', 'terbuka'
+                    'Data', 6000000, 12000000, '2027-10-15', 'terbuka',
                 ],
                 [
                     5, 4, 'Chatbot Layanan Pelanggan',
                     'Chatbot FAQ untuk situs sekolah, dapat dijawab dalam bahasa Indonesia.',
-                    'AI', 4000000, 8000000, '2026-08-20', 'terbuka'
+                    'AI', 4000000, 8000000, '2026-08-20', 'terbuka',
                 ],
                 [
                     6, 4, 'Sistem Absensi Sekolah',
                     'Sistem absensi siswa berbasis web dengan rekap per kelas dan laporan bulanan untuk wali kelas.',
-                    'Web', 7000000, 14000000, '2026-07-10', 'ditutup'
+                    'Web', 7000000, 14000000, '2026-07-10', 'ditutup',
                 ],
                 [
                     7, 2, 'Migrasi Database ke MySQL',
                     'Memindahkan data inventaris dari spreadsheet ke MySQL dan membuat skrip impor.',
-                    'Data', 3000000, 6000000, '2026-06-30', 'ditutup'
+                    'Data', 3000000, 6000000, '2026-06-30', 'ditutup',
                 ],
                 [
                     8, 3, 'Landing Page Event Kampus',
                     'Satu halaman informasi acara seminar teknologi dengan formulir pendaftaran sederhana.',
-                    'Web', 1500000, 3000000, '2027-09-01', 'terbuka'
+                    'Web', 1500000, 3000000, '2027-09-01', 'terbuka',
                 ],
             ];
 
@@ -93,7 +91,7 @@ class GarudaHubSeeder extends Seeder
 
             foreach ($projects as [
                 $id, $clientId, $judul, $deskripsi, $kategori,
-                $budgetMin, $budgetMax, $batasLelang, $status
+                $budgetMin, $budgetMax, $batasLelang, $status,
             ]) {
                 $project = Project::updateOrCreate(
                     ['judul' => $judul],
@@ -111,7 +109,6 @@ class GarudaHubSeeder extends Seeder
                 $projectIds[$id] = $project->id;
             }
 
-            // -- Penawaran (15)
             $bids = [
                 [1, 5, 8500000, 30, 'Saya akan membangun dengan PHP dan MySQL, lengkap dengan panel admin produk.', 0],
                 [1, 6, 7000000, 40, 'Pengalaman 3 tahun membuat toko online. Termasuk pelatihan penggunaan.', 0],
@@ -132,7 +129,7 @@ class GarudaHubSeeder extends Seeder
 
             foreach ($bids as [
                 $projectId, $developerId, $harga,
-                $durasi, $proposal, $isWinner
+                $durasi, $proposal, $isWinner,
             ]) {
                 Bid::updateOrCreate(
                     [

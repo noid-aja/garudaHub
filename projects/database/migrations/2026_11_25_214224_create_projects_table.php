@@ -14,19 +14,19 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignid('client_id')
+            $table->foreignId('client_id')
                 ->constrained('users')
-                ->cascadeondelete();
+                ->cascadeOnDelete();
 
             $table->string('judul', 100);
-            $table->text('deskripsi',);
+            $table->text('deskripsi');
             $table->string('kategori', 50);
             $table->unsignedBigInteger('budget_min')
-                    ->default(0);
+                ->default(0);
             $table->unsignedBigInteger('budget_max')
-                    ->default(0);
-            $table->enum('status', ['terbuka','ditutup'])
-                    ->default('terbuka');
+                ->default(0);
+            $table->enum('status', ['terbuka', 'ditutup'])
+                ->default('terbuka');
             $table->date('batas_lelang');
             $table->timestamps();
             $table->index('status');

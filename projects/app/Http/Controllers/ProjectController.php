@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -15,21 +13,20 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $request->validate([
-            'cari' => ['nullable','string', 'max:100']]);
-
+            'cari' => ['nullable', 'string', 'max:100'],
+        ]);
 
         $projects = Project::with('client')
             ->withCount('bids')
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
-
                 $query->where(function ($q) use ($cari) {
                     $q->where('judul', 'like', "%{$cari}%")
-                      ->orWhere('kategori', 'like', "%{$cari}%");
+                        ->orWhere('kategori', 'like', "%{$cari}%");
                 });
             })
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('projects.index', compact('projects'));
     }
@@ -37,14 +34,11 @@ class ProjectController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('projects.form', [
-            'project' => null,
-            'clients' => User::where('role', 'klien')
-                ->orderBy('nama')
-                ->get(),
-                ]);
+        $this->pastikanKlien($request);
+
+        return view('projects.form', ['project' => null]);
     }
 
     /**
@@ -52,12 +46,16 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $this->pastikanKlien($request);
+        $this->normalisasiBudget($request);
+
         $data = $request->validate($this->rules());
+        $data['client_id'] = $request->user()->id;
+        $data['status'] = 'terbuka';
 
         $project = Project::create($data);
 
-        return redirect()
-            ->route('projects.show', $project)
+        return redirect()->route('projects.show', $project)
             ->with('success', 'Proyek berhasil ditambahkan.');
     }
 
@@ -68,27 +66,18 @@ class ProjectController extends Controller
     {
         $project->load(['client', 'bids.developer']);
 
-        $developers = User::where('role', 'developer')
-            ->orderBy('nama')
-            ->get();
-
-        return view('projects.show', compact(
-            'project',
-            'developers'
-    ));
+        return view('projects.show', compact('project'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project $project)
+    public function edit(Request $request, Project $project)
     {
-        return view('projects.form', [
-            'project' => $project,
-            'clients' => User::where('role', 'klien')
-                ->orderBy('nama')
-                ->get(),
-        ]);
+        $this->pastikanPemilik($request, $project);
+        $this->pastikanBelumAdaPemenang($project);
+
+        return view('projects.form', compact('project'));
     }
 
     /**
@@ -96,51 +85,75 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        $this->pastikanPemilik($request, $project);
+        $this->pastikanBelumAdaPemenang($project);
+        $this->normalisasiBudget($request);
+
         $data = $request->validate($this->rules());
+        $project->update($data);
 
-        if (
-            $project->bids()->where('is_winner', true)->exists()
-            && $data['status'] !== 'ditutup'
-        ) {
-            return back()->withErrors([
-                'status' => 'Proyek yang memiliki pemenang tidak boleh dibuka kembali.',
-                ]);
-    }
-
-    $project->update($data);
-
-    return redirect()
-        ->route('projects.show', $project)
-        ->with('success', 'Proyek berhasil diperbarui.');
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Proyek berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Project $project)
+    public function destroy(Request $request, Project $project)
     {
+        $this->pastikanPemilik($request, $project);
+        $this->pastikanBelumAdaPemenang($project);
         $project->delete();
 
-        return redirect()
-            ->route('projects.index')
+        return redirect()->route('projects.index')
             ->with('success', 'Proyek berhasil dihapus.');
     }
 
-     private function rules(): array
+    private function pastikanKlien(Request $request): void
+    {
+        abort_unless($request->user()?->role === 'klien', 403);
+    }
+
+    private function pastikanPemilik(Request $request, Project $project): void
+    {
+        $this->pastikanKlien($request);
+
+        abort_unless(
+            $request->user()->id === $project->client_id,
+            403,
+            'Proyek ini bukan milik Anda.'
+        );
+    }
+
+    private function pastikanBelumAdaPemenang(Project $project): void
+    {
+        abort_if(
+            $project->bids()->where('is_winner', true)->exists(),
+            403,
+            'Proyek yang sudah memiliki pemenang tidak dapat diubah.'
+        );
+    }
+
+    private function normalisasiBudget(Request $request): void
+    {
+        foreach (['budget_min', 'budget_max'] as $kolom) {
+            $nilai = $request->input($kolom);
+
+            if (is_string($nilai) && preg_match('/^(?:[0-9]+|[0-9]{1,3}(?:\.[0-9]{3})+)$/D', $nilai)) {
+                $request->merge([$kolom => str_replace('.', '', $nilai)]);
+            }
+        }
+    }
+
+    private function rules(): array
     {
         return [
-            'client_id' => [
-                'required',
-                'integer',
-                Rule::exists('users', 'id')->where('role', 'klien'),
-            ],
             'judul' => ['required', 'string', 'max:100'],
             'deskripsi' => ['required', 'string'],
             'kategori' => ['required', 'string', 'max:50'],
-            'budget_min' => ['required', 'integer', 'min:0'],
-            'budget_max' => ['required', 'integer', 'gte:budget_min'],
+            'budget_min' => ['required', 'integer', 'min:0', 'max:999999999999'],
+            'budget_max' => ['required', 'integer', 'gte:budget_min', 'max:999999999999'],
             'batas_lelang' => ['required', 'date'],
-            'status' => ['required', Rule::in(['terbuka', 'ditutup'])],
         ];
     }
 }

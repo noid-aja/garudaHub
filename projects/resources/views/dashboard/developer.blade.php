@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -7,7 +6,7 @@
 <div class="card">
     <h2>Selamat datang, {{ $user->nama }}</h2>
 
-    <p>Total Penawaran: {{ $bids->count() }}</p>
+    <p>Total Penawaran: {{ $bids->total() }}</p>
 </div>
 
 <h2>Riwayat Penawaran Saya</h2>
@@ -38,6 +37,8 @@
         <p>Belum mengajukan penawaran.</p>
     </div>
 @endforelse
+
+{{ $bids->links() }}
 
 <a href="{{ route('dashboard.index') }}">
     Kembali ke Dashboard

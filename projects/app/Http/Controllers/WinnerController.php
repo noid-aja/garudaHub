@@ -4,50 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Bid;
 use App\Models\Project;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class WinnerController extends Controller
 {
-    public function store(Project $project, Bid $bid)
+    public function store(Request $request, Project $project, Bid $bid)
     {
-        // Hanya untuk simulasi lokal sebelum ada autentikasi.
-        abort_unless(app()->environment('local'), 403);
+        abort_unless(
+            $request->user()?->role === 'klien'
+                && $request->user()->id === $project->client_id,
+            403,
+            'Hanya klien pemilik proyek yang boleh memilih pemenang.'
+        );
 
-        // Penawaran harus berasal dari proyek yang dipilih.
         abort_unless($bid->project_id === $project->id, 404);
 
         DB::transaction(function () use ($project, $bid) {
-
-            // Kunci proyek selama proses pemilihan.
-            $proyek = Project::query()
-                ->lockForUpdate()
-                ->findOrFail($project->id);
+            $proyek = Project::query()->lockForUpdate()->findOrFail($project->id);
 
             if (
-                $proyek->status !== 'terbuka' ||
-                $proyek->bids()->where('is_winner', true)->exists()
+                $proyek->status !== 'terbuka'
+                || $proyek->bids()->where('is_winner', true)->exists()
             ) {
                 throw ValidationException::withMessages([
-                    'pemenang' => 'Proyek sudah ditutup atau sudah memiliki pemenang.',
+                    'pemenang' => 'Proyek sudah ditutup atau memiliki pemenang.',
                 ]);
             }
 
-            // Tandai penawaran yang dipilih sebagai pemenang.
             $penawaran = $proyek->bids()->findOrFail($bid->id);
-
-            $penawaran->update([
-                'is_winner' => true,
-            ]);
-
-            // Tutup proyek setelah pemenang dipilih.
-            $proyek->update([
-                'status' => 'ditutup',
-            ]);
+            $penawaran->update(['is_winner' => true]);
+            $proyek->update(['status' => 'ditutup']);
         });
 
-        return redirect()
-            ->route('projects.show', $project)
-            ->with('success', 'Pemenang lelang berhasil dipilih.');
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Pemenang berhasil dipilih.');
     }
 }
