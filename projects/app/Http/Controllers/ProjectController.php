@@ -98,11 +98,20 @@ class ProjectController extends Controller
     {
         $data = $request->validate($this->rules());
 
-        $project->update($data);
+        if (
+            $project->bids()->where('is_winner', true)->exists()
+            && $data['status'] !== 'ditutup'
+        ) {
+            return back()->withErrors([
+                'status' => 'Proyek yang memiliki pemenang tidak boleh dibuka kembali.',
+                ]);
+    }
 
-        return redirect()
-            ->route('projects.show', $project)
-            ->with('success', 'Proyek berhasil diperbarui.');
+    $project->update($data);
+
+    return redirect()
+        ->route('projects.show', $project)
+        ->with('success', 'Proyek berhasil diperbarui.');
     }
 
     /**

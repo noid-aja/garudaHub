@@ -55,9 +55,20 @@
     </style>
 </head>
 <body>
-    <header>
-        <a href="{{ route('projects.index') }}">Garuda-Hub</a>
-    </header>
+
+<header>
+    <a href="{{ route('projects.index') }}">
+        Garuda-Hub
+    </a>
+
+    @if (app()->environment('local'))
+        <a href="{{ route('dashboard.index') }}"
+           style="margin-left: 25px; font-size: 16px;">
+            Dashboard
+        </a>
+    @endif
+</header>
+
 
     <main>
         @if (session('success'))

@@ -19,11 +19,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     public function projects(): HasMany{
-        return $this->hasMany(Projects::class, 'client_id');
+        return $this->hasMany(Project::class, 'client_id');
     }
 
     public function bids(): HasMany{
-        return $this->hasMany(Bids::class, 'developer_id');
+        return $this->hasMany(Bid::class, 'developer_id');
     }
 
     /**

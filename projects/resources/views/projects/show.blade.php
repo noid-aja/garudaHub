@@ -122,6 +122,22 @@
             <p class="success"><b>Pemenang Lelang</b></p>
         @endif
 
+@if (
+    app()->environment('local')
+    && $project->status === 'terbuka'
+    && !$project->bids->contains('is_winner', true)
+)
+    <form method="POST"
+          action="{{ route('bids.winner', [$project, $bid]) }}"
+          onsubmit="return confirm('Yakin memilih developer ini sebagai pemenang?')">
+        @csrf
+
+        <button type="submit" class="btn">
+            Pilih sebagai Pemenang
+        </button>
+    </form>
+@endif
+
         @if (
             $project->status === 'terbuka'
             && !$project->batas_lelang->isBefore(today())
