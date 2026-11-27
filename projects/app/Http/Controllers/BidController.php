@@ -48,8 +48,8 @@ class BidController extends Controller
         }
 
         $data = $request->validate([
-            'harga' => ['required', 'integer', 'min:1'],
-            'durasi' => ['required', 'integer', 'min:1'],
+            'harga' => ['required', 'integer', 'min:1', 'max:500000000'],
+            'durasi' => ['required', 'integer', 'min:1', 'max:365'],
             'proposal' => ['required', 'string', 'max:5000'],
         ]);
 
@@ -76,8 +76,8 @@ class BidController extends Controller
         abort_unless($this->lelangAktif($project) && !$bid->is_winner, 403);
 
         $data = $request->validate([
-            'harga' => ['required', 'integer', 'min:1'],
-            'durasi' => ['required', 'integer', 'min:1'],
+            'harga' => ['required', 'integer', 'min:1', 'max:999999999999'],
+            'durasi' => ['required', 'integer', 'min:1', 'max:3650'],
             'proposal' => ['required', 'string', 'max:5000'],
         ]);
 

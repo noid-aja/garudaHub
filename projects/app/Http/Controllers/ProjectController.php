@@ -49,7 +49,7 @@ class ProjectController extends Controller
         $this->pastikanKlien($request);
         $this->normalisasiBudget($request);
 
-        $data = $request->validate($this->rules());
+        $data = $request->validate($this->rules($request));
         $data['client_id'] = $request->user()->id;
         $data['status'] = 'terbuka';
 
@@ -89,7 +89,7 @@ class ProjectController extends Controller
         $this->pastikanBelumAdaPemenang($project);
         $this->normalisasiBudget($request);
 
-        $data = $request->validate($this->rules());
+        $data = $request->validate($this->rules($request, $project));
         $project->update($data);
 
         return redirect()->route('projects.show', $project)
@@ -145,7 +145,7 @@ class ProjectController extends Controller
         }
     }
 
-    private function rules(): array
+    private function rules(Request $request, ?Project $project = null): array
     {
         return [
             'judul' => ['required', 'string', 'max:100'],
@@ -153,7 +153,13 @@ class ProjectController extends Controller
             'kategori' => ['required', 'string', 'max:50'],
             'budget_min' => ['required', 'integer', 'min:0', 'max:999999999999'],
             'budget_max' => ['required', 'integer', 'gte:budget_min', 'max:999999999999'],
-            'batas_lelang' => ['required', 'date'],
+            'batas_lelang' => [
+                'required',
+                'date',
+                ...($project && $request->input('batas_lelang') === $project->batas_lelang->format('Y-m-d')
+                    ? []
+                    : ['after_or_equal:today']),
+            ],
         ];
     }
 }

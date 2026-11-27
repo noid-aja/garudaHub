@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BidController;
 use App\Http\Controllers\DashboardController;
@@ -59,9 +60,23 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard/developer', [DashboardController::class, 'developer'])
         ->name('dashboard.developer');
-        
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])
         ->name('dashboard.admin');
+
+    Route::get('/admin/users', [AdminController::class, 'users'])
+        ->name('admin.users');
+
+    Route::patch('/admin/users/{user}/role', [AdminController::class, 'updateRole'])
+        ->name('admin.users.role');
+
+    Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])
+        ->name('admin.users.destroy');
+
+    Route::get('/admin/projects', [AdminController::class, 'projects'])
+        ->name('admin.projects');
+
+    Route::delete('/admin/projects/{project}', [AdminController::class, 'deleteProject'])
+        ->name('admin.projects.destroy');
 });
 
 Route::get('/projects/{project}', [ProjectController::class, 'show'])

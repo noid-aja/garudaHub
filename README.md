@@ -1,5 +1,7 @@
 # Garuda-Hub
 
+> **Versi Laravel MVC (tugas refactoring):** buka folder [`projects/`](projects/README.md) untuk instalasi, menjalankan aplikasi, dan pengujian. Bagian README di bawah menjelaskan versi PHP Native lama (`src/`) sebagai referensi awal. Jangan mengimpor `src/database.sql` ke database Laravel karena skrip tersebut membuat ulang tabel dan bisa menghapus data.
+
 Website lelang proyek IT: klien memasang proyek, developer menawar, klien memilih pemenang. Dibuat untuk **studi kasus pembelajaran keamanan** mahasiswa dengan praktik PHP standar. Semua data adalah data dummy.
 
 ## PERINGATAN

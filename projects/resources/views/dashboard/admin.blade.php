@@ -18,8 +18,12 @@
 </div>
 
 <a class="btn" href="{{ route('projects.index') }}">
-    Kelola Proyek
+    Lihat Daftar Proyek
 </a>
+
+<p><a class="btn" href="{{ route('admin.users') }}">Kelola Pengguna</a></p>
+
+<p><a class="btn" href="{{ route('admin.projects') }}">Kelola Proyek</a></p>
 
 <a href="{{ route('dashboard.index') }}">
     Kembali ke Dashboard
