@@ -20,11 +20,11 @@
                autocomplete="email" required>
 
         <label>Password</label>
-        <div style="position:relative">
+        <div class="password-wrapper">
             <input type="password" name="password" id="loginPassword"
-                   autocomplete="current-password" style="padding-right:130px" required>
+                   autocomplete="current-password" class="password-input" required>
             <button type="button" id="lihatPassword"
-                    style="position:absolute; right:8px; top:7px; padding:8px; cursor:pointer">
+                    class="password-toggle-button">
                 Lihat
             </button>
         </div>
@@ -32,20 +32,10 @@
         <button class="btn" type="submit">Login</button>
     </form>
 
-    <p style="text-align:center; margin-top:20px">
+    <p class="auth-footer">
         Belum punya akun?
         <a href="{{ route('register') }}">Daftar sekarang</a>
     </p>
 </div>
 
-<script>
-    const passwordLogin = document.getElementById('loginPassword');
-    const tombolLihat = document.getElementById('lihatPassword');
-
-    tombolLihat.addEventListener('click', function () {
-        const terlihat = passwordLogin.type === 'text';
-        passwordLogin.type = terlihat ? 'password' : 'text';
-        tombolLihat.textContent = terlihat ? 'Lihat' : 'Sembunyikan';
-    });
-</script>
 @endsection

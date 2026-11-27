@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>404 — Garuda-Hub</title></head><body><h1>404</h1><p>Halaman tidak ditemukan.</p><a href="/">Kembali ke beranda</a></body></html>

@@ -6,7 +6,8 @@
 
     <p><b>Klien:</b> {{ $project->client->nama }}</p>
     <p><b>Kategori:</b> {{ $project->kategori }}</p>
-    <p style="white-space: pre-wrap">{{ $project->deskripsi }}</p>
+    {{-- NIM: 252410102046 | Output encoding Blade {{ }} mencegah Stored XSS pada deskripsi. --}}
+    <p class="preserve-lines">{{ $project->deskripsi }}</p>
 
     <p>
         <b>Budget:</b>
@@ -35,7 +36,7 @@
 
             <form method="POST"
                   action="{{ route('projects.destroy', $project) }}"
-                  style="display:inline">
+                  class="inline-form">
                 @csrf
                 @method('DELETE')
 
@@ -106,7 +107,7 @@
         </p>
 
         <p><b>Durasi:</b> {{ $bid->durasi }} hari</p>
-        <p style="white-space: pre-wrap">{{ $bid->proposal }}</p>
+        <p class="preserve-lines">{{ $bid->proposal }}</p>
 
         @if ($bid->is_winner)
             <p class="success"><b>Pemenang Lelang</b></p>
@@ -126,7 +127,7 @@
 
                 <form method="POST"
                       action="{{ route('bids.destroy', [$project, $bid]) }}"
-                      style="display:inline">
+                      class="inline-form">
                     @csrf
                     @method('DELETE')
 
@@ -144,7 +145,7 @@
             )
                 <form method="POST"
                       action="{{ route('bids.winner', [$project, $bid]) }}"
-                      onsubmit="return confirm('Pilih developer ini sebagai pemenang?')">
+                      data-confirm="Pilih developer ini sebagai pemenang?">
                     @csrf
 
                     <button class="btn" type="submit">

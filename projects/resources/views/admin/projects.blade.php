@@ -17,7 +17,7 @@
         <p>Jumlah penawaran: {{ $project->bids_count }}</p>
 
         <form method="POST" action="{{ route('admin.projects.destroy', $project) }}"
-              onsubmit="return confirm('Hapus proyek dan semua penawarannya?')">
+              data-confirm="Hapus proyek dan semua penawarannya?">
             @csrf
             @method('DELETE')
             <button class="btn" type="submit">Hapus Proyek</button>
@@ -27,5 +27,5 @@
     <p>Belum ada proyek.</p>
 @endforelse
 
-{{ $projects->links() }}
+{{ $projects->links('pagination.simple') }}
 @endsection

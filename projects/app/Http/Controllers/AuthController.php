@@ -12,16 +12,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function showLogin(Request $request)
+    public function showLogin()
     {
+        // NIM: 252410102046 - GET /login tidak boleh mengubah status autentikasi.
         if (Auth::check()) {
-            if (app()->environment('local')) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-            } else {
-                return redirect()->route('dashboard.index');
-            }
+            return redirect()->route('dashboard.index');
         }
 
         return response()->view('projects.login')
@@ -58,7 +53,7 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'max:100', 'unique:users,email'],
             'password' => [
                 'required', 'confirmed',
-                Password::min(8)->letters()->numbers(),
+                Password::min(12)->mixedCase()->numbers()->symbols(),
             ],
             'role' => ['required', Rule::in(['klien', 'developer'])],
         ]);

@@ -34,7 +34,7 @@
             </form>
 
             <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                  onsubmit="return confirm('Hapus pengguna beserta proyek dan penawarannya?')">
+                  data-confirm="Hapus pengguna beserta proyek dan penawarannya?">
                 @csrf
                 @method('DELETE')
                 <button class="btn" type="submit">Hapus Pengguna</button>
@@ -45,5 +45,5 @@
     <p>Belum ada pengguna.</p>
 @endforelse
 
-{{ $users->links() }}
+{{ $users->links('pagination.simple') }}
 @endsection

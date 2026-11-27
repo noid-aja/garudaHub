@@ -33,7 +33,7 @@
     </div>
 @endforelse
 
-{{ $projects->links() }}
+{{ $projects->links('pagination.simple') }}
 
 <a href="{{ route('dashboard.index') }}">
     Kembali ke Dashboard

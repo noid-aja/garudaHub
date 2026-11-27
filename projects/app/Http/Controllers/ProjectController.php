@@ -20,6 +20,7 @@ class ProjectController extends Controller
             ->withCount('bids')
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
+                // Eloquent mem-binding parameter: input tidak dirangkai sebagai SQL mentah.
                 $query->where(function ($q) use ($cari) {
                     $q->where('judul', 'like', "%{$cari}%")
                         ->orWhere('kategori', 'like', "%{$cari}%");

@@ -12,7 +12,7 @@
     @endauth
 
     <form method="GET" action="{{ route('projects.index') }}"
-          style="margin: 20px 0">
+          class="search-form">
         <input type="text" name="cari"
                placeholder="Cari judul atau kategori..."
                value="{{ request('cari') }}">
@@ -46,5 +46,5 @@
         <p>Belum ada proyek.</p>
     @endforelse
 
-    {{ $projects->withQueryString()->links() }}
+    {{ $projects->withQueryString()->links('pagination.simple') }}
 @endsection

@@ -38,7 +38,7 @@
     </div>
 @endforelse
 
-{{ $bids->links() }}
+{{ $bids->links('pagination.simple') }}
 
 <a href="{{ route('dashboard.index') }}">
     Kembali ke Dashboard

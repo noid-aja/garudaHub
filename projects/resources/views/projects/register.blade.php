@@ -30,31 +30,25 @@
         </select>
 
         <label>Password</label>
+        <p>Minimal 12 karakter, mengandung huruf besar, huruf kecil, angka, dan simbol.</p>
         <input type="password" name="password" id="registerPassword"
-               autocomplete="new-password" minlength="8" required>
+               autocomplete="new-password" minlength="12" required>
 
         <label>Konfirmasi Password</label>
         <input type="password" name="password_confirmation" id="confirmPassword"
-               autocomplete="new-password" minlength="8" required>
+               autocomplete="new-password" minlength="12" required>
 
-        <label style="display:flex; align-items:center; gap:8px">
-            <input type="checkbox" id="tampilPassword" style="width:auto; margin:0">
+        <label class="password-toggle-label">
+            <input type="checkbox" id="tampilPassword" class="password-toggle-checkbox">
             Tampilkan password
         </label>
 
         <button class="btn" type="submit">Buat Akun</button>
     </form>
 
-    <p style="text-align:center; margin-top:20px">
+    <p class="auth-footer">
         Sudah punya akun? <a href="{{ route('login') }}">Login</a>
     </p>
 </div>
 
-<script>
-    document.getElementById('tampilPassword').addEventListener('change', function () {
-        const tipe = this.checked ? 'text' : 'password';
-        document.getElementById('registerPassword').type = tipe;
-        document.getElementById('confirmPassword').type = tipe;
-    });
-</script>
 @endsection

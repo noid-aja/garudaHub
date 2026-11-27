@@ -60,4 +60,4 @@ php artisan test
 ## Catatan keamanan
 
 Jalankan di localhost untuk tugas kuliah. Sebelum deployment, audit konfigurasi produksi, hak akses, pengamanan session, CSRF, XSS, serta lakukan pemindaian OWASP ZAP sesuai tugas keamanan berikutnya.
-Saat ini membuka `GET /login` ketika session masih aktif dapat mengakhiri session dalam lingkungan `local`, khusus untuk kemudahan pengujian pergantian akun. Untuk produksi, gunakan logout lewat POST.
+**Tugas 2 (The Phantom Vulnerability):** `GET /login` tidak lagi mengakhiri session. Logout hanya lewat `POST /logout` dengan CSRF. Output halaman menggunakan Blade `{{ }}` untuk HTML escaping, login menggunakan `Auth::attempt`, password disimpan sebagai hash, dan respons mendapatkan header keamanan tambahan. Panduan pengujian dan bukti OWASP ZAP ada di `../docs/tugas-2-keamanan.md`.

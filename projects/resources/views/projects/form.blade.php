@@ -50,17 +50,4 @@
     </form>
 </div>
 
-<script>
-    function formatRupiah(input) {
-        const angka = input.value.replace(/\D/g, '');
-        input.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-
-    ['budget_min', 'budget_max'].forEach(function (id) {
-        const input = document.getElementById(id);
-        input.addEventListener('input', function () {
-            formatRupiah(input);
-        });
-    });
-</script>
 @endsection
